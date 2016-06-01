@@ -73,4 +73,18 @@ app.post('/todos',function(req, res){
 	res.json(body).send();
 });
 
+app.delete('/todos/:id', function(req, res){
+	var TodoId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todos, {id:TodoId});
+	if(matchedTodo)
+	{
+		todos = _.without(todos,matchedTodo);
+		res.json(matchedTodo).send();
+	}
+	else
+	{
+		res.status(404).json({"error":"No record found with id: "+TodoId});
+	}
+});
+
 app.listen(PORT, function(){ console.log('Server running at port '+ PORT); });
