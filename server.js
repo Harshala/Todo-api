@@ -29,8 +29,25 @@ app.get('/',function(req, res){
 	res.send('Todo Api running');
 });
 
-app.get('/todos', function(req, res){
+/*app.get('/todos', function(req, res){
 	res.json(todos);
+});*/
+
+app.get('/todos',function(req,res)
+{
+	var queryparams = req.query;
+	var filteredTodos = todos;
+
+	if(queryparams.hasOwnProperty("complete") && queryparams.complete === 'true')
+	{
+		filteredTodos = _.where(filteredTodos,{"complete":true});
+	}
+	else if(queryparams.hasOwnProperty("complete") && queryparams.complete === 'false')
+	{
+		filteredTodos = _.where(filteredTodos,{"complete":false});
+	}
+
+	res.json(filteredTodos);
 });
 
 app.get('/todos/:id', function(req, res){
