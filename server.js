@@ -68,7 +68,7 @@ app.get('/todos/:id', function(req, res) {
 		}
 	});*/
 
-	var matchedTodo = _.findWhere(todos, {
+	/*var matchedTodo = _.findWhere(todos, {
 		id: TodoId
 	});
 
@@ -76,7 +76,21 @@ app.get('/todos/:id', function(req, res) {
 		res.json(matchedTodo);
 	} else {
 		res.status(404).send();
-	}
+	}*/
+
+	db.todo.findById(TodoId).then(function(todo){
+		if(todo)
+		{
+			res.send(todo.toJSON());
+		}
+		else
+		{
+			res.status(404).send();
+		}
+	},function(e){
+		res.status(500).send();
+	})
+
 });
 
 app.post('/todos', function(req, res) {
