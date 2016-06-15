@@ -4,6 +4,7 @@ var _ = require('underscore');
 var db = require("./db.js");
 var todoIdNext = 1;
 var bodyParser = require('body-parser');
+var bcrypt = require("bcrypt");
 
 var PORT = process.env.PORT || 3000;
 
@@ -114,7 +115,7 @@ app.get('/todos/:id', function(req, res) {
 		}
 	},function(e){
 		res.status(500).send();
-	})
+	});
 
 });
 
@@ -134,10 +135,10 @@ app.post('/todos', function(req, res) {
 	res.json(body).send();*/
 
 	db.todo.create(body).then(function(todo){		
-			res.json(todo.toJSON());
-		},function(e){
-			res.status(400).json(e);
-		});
+		res.json(todo.toJSON());
+	},function(e){
+		res.status(400).json(e);
+	});
 });
 
 app.delete('/todos/:id', function(req, res) {
@@ -226,12 +227,42 @@ app.put('/todos/:id', function(req, res) {
 
 app.post('/users', function(req, res) {
 	var body = _.pick(req.body, "email", "password");
-
+	/*var body = JSON.stringify(req.body);
+	var temp = JSON.parse(body);*/
+	//return res.json(temp);
 	db.user.create(body).then(function(user){		
 		res.json(user.toPublicJSON());
 	},function(e){
 		res.status(400).json(e);
 	});
+});
+
+app.post('/users/login', function(req, res){
+	var body = _.pick(req.body, "email", "password");
+	if(typeof body.email!=='string' || typeof body.password!=='string')
+	{
+		res.status(400).send();
+	}
+
+	db.user.authenticate(body).then(function(user){
+		res.json(user.toPublicJSON());
+	}, function(e){
+		res.status(401).send();
+	});
+
+	/*db.user.findOne({
+		where:{
+			email: body.email
+		}
+	}).then(function(user){
+		if(!user || !bcrypt.compareSync(body.password, user.get("password_hash")))
+		{
+			res.status(401).send();
+		}
+		res.json(user.toPublicJSON());
+	}, function(){
+		res.status(500).send();
+	});*/
 });
 
 db.sequelize.sync().then(function(){
