@@ -245,7 +245,7 @@ app.post('/users/login', function(req, res){
 	}
 
 	db.user.authenticate(body).then(function(user){
-		res.json(user.toPublicJSON());
+		res.header('Auth',user.generateToken('authenticate')).json(user.toPublicJSON());
 	}, function(e){
 		res.status(401).send();
 	});
